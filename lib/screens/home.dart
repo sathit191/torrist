@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-
+import 'package:torrist/models/user_model.dart';
+import 'package:torrist/screens/my_alert.dart';
+import 'package:torrist/screens/my_service.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,7 +14,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   //Explicit
-  String resultCode ='';
+  String resultCode = '';
   //Method
 
   Widget authenButton() {
@@ -36,13 +38,29 @@ class _HomeState extends State<Home> {
     } catch (e) {}
   }
 
-  Future<void> getUserWhereResultCode()async{
-    String urlAPI ='http://10.28.50.26/getUserWhereUserTor.php?isAdd=true&ResultCode=$resultCode';
+  Future<void> getUserWhereResultCode() async {
+    String urlAPI =
+        'http://10.28.50.26/getUserWhereUserTor.php?isAdd=true&ResultCode=$resultCode';
     Response response = await get(urlAPI);
     //print('Response = $response');
     var result = json.decode(response.body);
     print('result = $result');
-    
+
+    if (result.toString() == 'null') {
+      normalDialog('Result False', 'No $resultCode in My Database', context);
+    } else {
+      for (var map in result) {
+        UserModel userModel = UserModel.fromJSON(map);
+        MaterialPageRoute materialPageRoute =
+            MaterialPageRoute(builder: (BuildContext context) {
+          return MyService(userModel: userModel,);
+        });
+        Navigator.of(context).pushAndRemoveUntil(materialPageRoute,
+            (Route<dynamic> route) {
+          return false;
+        });
+      }
+    }
   }
 
   Widget showLogo() {
