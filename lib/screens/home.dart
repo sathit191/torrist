@@ -20,6 +20,7 @@ class _HomeState extends State<Home> {
       ),
       onPressed: () {
         print('คุณคลิ๊กปุ่ม');
+        readQRCode();
       },
     );
   }
